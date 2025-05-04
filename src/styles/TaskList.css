@@ -1,0 +1,16 @@
+.task-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.empty-task-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px dashed #cbd5e0;
+  color: #718096;
+}

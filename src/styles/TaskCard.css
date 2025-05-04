@@ -1,0 +1,154 @@
+.task-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.task-card.overdue {
+  border-left: 4px solid #e74c3c;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.task-title {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.25rem;
+}
+
+.task-priority {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.priority-high {
+  background-color: #fed7d7;
+  color: #c53030;
+}
+
+.priority-medium {
+  background-color: #feebc8;
+  color: #c05621;
+}
+
+.priority-low {
+  background-color: #c6f6d5;
+  color: #2f855a;
+}
+
+.task-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.task-description {
+  color: #4a5568;
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.task-due-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #718096;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.overdue-label {
+  background-color: #e74c3c;
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.3rem;
+  border-radius: 2px;
+}
+
+.task-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.status-todo {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+.status-in-progress {
+  background-color: #bee3f8;
+  color: #2b6cb0;
+}
+
+.status-done {
+  background-color: #c6f6d5;
+  color: #2f855a;
+}
+
+.task-assignee {
+  font-size: 0.75rem;
+  color: #718096;
+}
+
+.task-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.view-btn,
+.edit-btn {
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.view-btn {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+.view-btn:hover {
+  background-color: #cbd5e0;
+}
+
+.edit-btn {
+  background-color: #3498db;
+  color: white;
+}
+
+.edit-btn:hover {
+  background-color: #2980b9;
+}
