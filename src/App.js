@@ -11,6 +11,9 @@ import Notifications from "./pages/Notifications"
 import NotFound from "./pages/NotFound"
 import Layout from "./components/Layout"
 
+// Import base styles
+import "./index.css"
+
 // Protected route component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth()

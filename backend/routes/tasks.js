@@ -113,27 +113,32 @@ router.get("/overdue", async (req, res) => {
   }
 })
 
-// Search tasks
+// Search tasks - FIXED to only show user's own tasks
 router.get("/search", async (req, res) => {
   try {
     const { query, status, priority, dueDate } = req.query
 
+    // Base where clause - only show tasks created by or assigned to the current user
     const whereClause = {
       [Op.or]: [{ createdBy: req.user.id }, { assignedTo: req.user.id }],
     }
 
     // Add search query if provided
     if (query) {
-      whereClause[Op.or] = [{ title: { [Op.iLike]: `%${query}%` } }, { description: { [Op.iLike]: `%${query}%` } }]
+      whereClause[Op.and] = [
+        {
+          [Op.or]: [{ title: { [Op.iLike]: `%${query}%` } }, { description: { [Op.iLike]: `%${query}%` } }],
+        },
+      ]
     }
 
     // Add status filter if provided
-    if (status) {
+    if (status && status !== "ANY") {
       whereClause.status = status
     }
 
     // Add priority filter if provided
-    if (priority) {
+    if (priority && priority !== "ANY") {
       whereClause.priority = priority
     }
 
@@ -173,7 +178,7 @@ router.get("/search", async (req, res) => {
   }
 })
 
-// Get a specific task
+// Get a specific task - FIXED to only allow access to own tasks
 router.get("/:id", async (req, res) => {
   try {
     const task = await Task.findOne({
@@ -196,7 +201,7 @@ router.get("/:id", async (req, res) => {
     })
 
     if (!task) {
-      return res.status(404).json({ message: "Task not found" })
+      return res.status(404).json({ message: "Task not found or you don't have permission to view it" })
     }
 
     res.json(task)
@@ -265,7 +270,7 @@ router.post("/", async (req, res) => {
   }
 })
 
-// Update a task
+// Update a task - FIXED to handle assignment properly
 router.put("/:id", async (req, res) => {
   const transaction = await sequelize.transaction()
 

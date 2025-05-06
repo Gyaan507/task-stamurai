@@ -37,22 +37,33 @@ const TaskCard = ({ task }) => {
   return (
     <div className={`task-card ${isOverdue() ? "overdue" : ""}`}>
       <div className="task-header">
-        <h3 className="task-title">{task.title}</h3>
+        <span className={`task-status ${getStatusClass(task.status)}`}>
+          {task.status === "TODO" ? "To Do" : task.status === "IN_PROGRESS" ? "In Progress" : "Done"}
+        </span>
         <span className={`task-priority ${getPriorityClass(task.priority)}`}>{task.priority}</span>
       </div>
+
       <div className="task-body">
-        <p className="task-description">{task.description || "No description"}</p>
-        {task.dueDate && (
-          <p className="task-due-date">
-            Due: {formatDate(task.dueDate)}
-            {isOverdue() && <span className="overdue-label">OVERDUE</span>}
-          </p>
-        )}
-        <div className="task-meta">
-          <span className={`task-status ${getStatusClass(task.status)}`}>{task.status.replace("_", " ")}</span>
-          {task.assignee && <span className="task-assignee">Assigned to: {task.assignee.name}</span>}
-        </div>
+        <h3 className="task-title">{task.title}</h3>
+        <p className="task-description">{task.description || "No description provided"}</p>
       </div>
+
+      <div className="task-meta">
+        {task.dueDate && (
+          <div className="meta-item">
+            <i className={`fas fa-calendar ${isOverdue() ? "overdue" : ""}`}></i>
+            <span className={isOverdue() ? "overdue" : ""}>{formatDate(task.dueDate)}</span>
+          </div>
+        )}
+
+        {task.assignee && (
+          <div className="meta-item assignee">
+            <div className="assignee-avatar">{task.assignee.name.charAt(0).toUpperCase()}</div>
+            <span>{task.assignee.name}</span>
+          </div>
+        )}
+      </div>
+
       <div className="task-footer">
         <Link to={`/tasks/${task.id}`} className="view-btn">
           View Details

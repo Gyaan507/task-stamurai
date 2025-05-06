@@ -34,7 +34,19 @@ router.get("/unread/count", async (req, res) => {
   }
 })
 
-// Mark a notification as read
+// Mark all notifications as read
+router.patch("/read-all", async (req, res) => {
+  try {
+    await Notification.update({ read: true }, { where: { userId: req.user.id, read: false } })
+
+    res.json({ message: "All notifications marked as read" })
+  } catch (error) {
+    console.error("Error marking notifications as read:", error)
+    res.status(500).json({ message: "Error marking notifications as read" })
+  }
+})
+
+// Mark a specific notification as read
 router.patch("/:id/read", async (req, res) => {
   try {
     const notification = await Notification.findOne({
@@ -50,22 +62,10 @@ router.patch("/:id/read", async (req, res) => {
 
     await notification.update({ read: true })
 
-    res.json(notification)
+    res.json({ message: "Notification marked as read" })
   } catch (error) {
     console.error("Error marking notification as read:", error)
     res.status(500).json({ message: "Error marking notification as read" })
-  }
-})
-
-// Mark all notifications as read
-router.patch("/read-all", async (req, res) => {
-  try {
-    await Notification.update({ read: true }, { where: { userId: req.user.id, read: false } })
-
-    res.json({ message: "All notifications marked as read" })
-  } catch (error) {
-    console.error("Error marking all notifications as read:", error)
-    res.status(500).json({ message: "Error marking all notifications as read" })
   }
 })
 

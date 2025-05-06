@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import api from "../services/api"
 import TaskList from "../components/TaskList"
-import SearchFilter from "../components/SearchFilter"
 import "../styles/Dashboard.css"
 
 const Dashboard = () => {
@@ -12,11 +11,16 @@ const Dashboard = () => {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const [searchFilters, setSearchFilters] = useState({})
+
+  const [searchTerm, setSearchTerm] = useState("")
+  const [showFilters, setShowFilters] = useState(false)
+  const [statusFilter, setStatusFilter] = useState("")
+  const [priorityFilter, setPriorityFilter] = useState("")
+  const [dueDateFilter, setDueDateFilter] = useState("")
 
   useEffect(() => {
     fetchTasks()
-  }, [activeTab, searchFilters])
+  }, [activeTab])
 
   const fetchTasks = async () => {
     setLoading(true)
@@ -34,19 +38,6 @@ const Dashboard = () => {
         endpoint = "/tasks/overdue"
       }
 
-      // Add search filters if any
-      if (Object.keys(searchFilters).length > 0) {
-        endpoint = "/tasks/search"
-        const params = new URLSearchParams()
-
-        if (searchFilters.query) params.append("query", searchFilters.query)
-        if (searchFilters.status) params.append("status", searchFilters.status)
-        if (searchFilters.priority) params.append("priority", searchFilters.priority)
-        if (searchFilters.dueDate) params.append("dueDate", searchFilters.dueDate)
-
-        endpoint += `?${params.toString()}`
-      }
-
       const response = await api.get(endpoint)
       setTasks(response.data)
     } catch (error) {
@@ -57,8 +48,44 @@ const Dashboard = () => {
     }
   }
 
-  const handleSearch = (filters) => {
-    setSearchFilters(filters)
+  const handleSearch = (e) => {
+    e.preventDefault()
+
+    // Apply search and filters
+    searchTasks()
+  }
+
+  const searchTasks = async () => {
+    setLoading(true)
+    setError("")
+
+    try {
+      const params = new URLSearchParams()
+
+      if (searchTerm) params.append("query", searchTerm)
+      if (statusFilter) params.append("status", statusFilter)
+      if (priorityFilter) params.append("priority", priorityFilter)
+      if (dueDateFilter) params.append("dueDate", dueDateFilter)
+
+      const queryString = params.toString()
+      const endpoint = queryString ? `/tasks/search?${queryString}` : "/tasks"
+
+      const response = await api.get(endpoint)
+      setTasks(response.data)
+    } catch (error) {
+      console.error("Error searching tasks:", error)
+      setError("Failed to search tasks. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const clearFilters = () => {
+    setSearchTerm("")
+    setStatusFilter("")
+    setPriorityFilter("")
+    setDueDateFilter("")
+    fetchTasks()
   }
 
   const getEmptyMessage = () => {
@@ -77,13 +104,74 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h1>Task Dashboard</h1>
+        <div>
+          <h1>Task Dashboard</h1>
+          <p className="dashboard-subtitle">Manage your tasks and assignments</p>
+        </div>
         <Link to="/tasks/create" className="create-task-btn">
-          Create New Task
+          <i className="fas fa-plus-circle"></i>
+          <span>Create Task</span>
         </Link>
       </div>
 
-      <SearchFilter onSearch={handleSearch} />
+      <div className="search-filter-container">
+        <form onSubmit={handleSearch} className="search-form">
+          <div className="search-input-wrapper">
+            <i className="fas fa-search search-icon"></i>
+            <input
+              type="text"
+              placeholder="Search tasks..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+            <button type="submit" className="search-btn">
+              Search
+            </button>
+            <button type="button" className="filter-toggle-btn" onClick={() => setShowFilters(!showFilters)}>
+              <i className={`fas ${showFilters ? "fa-times" : "fa-filter"}`}></i>
+            </button>
+          </div>
+
+          {showFilters && (
+            <div className="filters-container">
+              <div className="filter-group">
+                <label htmlFor="status">Status</label>
+                <select id="status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                  <option value="">Any Status</option>
+                  <option value="TODO">To Do</option>
+                  <option value="IN_PROGRESS">In Progress</option>
+                  <option value="DONE">Done</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label htmlFor="priority">Priority</label>
+                <select id="priority" value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)}>
+                  <option value="">Any Priority</option>
+                  <option value="LOW">Low</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="HIGH">High</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label htmlFor="dueDate">Due Date</label>
+                <input
+                  type="date"
+                  id="dueDate"
+                  value={dueDateFilter}
+                  onChange={(e) => setDueDateFilter(e.target.value)}
+                />
+              </div>
+
+              <button type="button" onClick={clearFilters} className="clear-filters-btn">
+                Clear Filters
+              </button>
+            </div>
+          )}
+        </form>
+      </div>
 
       <div className="dashboard-tabs">
         <button className={`tab-btn ${activeTab === "all" ? "active" : ""}`} onClick={() => setActiveTab("all")}>
@@ -112,7 +200,10 @@ const Dashboard = () => {
       {error && <div className="error-message">{error}</div>}
 
       {loading ? (
-        <div className="loading-spinner">Loading tasks...</div>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading tasks...</p>
+        </div>
       ) : (
         <TaskList tasks={tasks} emptyMessage={getEmptyMessage()} />
       )}

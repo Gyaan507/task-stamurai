@@ -15,6 +15,7 @@ const TaskForm = ({ task, isEditing = false }) => {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
 
   const navigate = useNavigate()
 
@@ -45,6 +46,7 @@ const TaskForm = ({ task, isEditing = false }) => {
     e.preventDefault()
     setLoading(true)
     setError("")
+    setSuccess("")
 
     try {
       const taskData = {
@@ -53,16 +55,21 @@ const TaskForm = ({ task, isEditing = false }) => {
         dueDate: dueDate || null,
         priority,
         status,
-        assignedTo: assignedTo || null,
+        assignedTo: assignedTo === "unassigned" ? null : assignedTo || null,
       }
 
       if (isEditing) {
         await api.put(`/tasks/${task.id}`, taskData)
+        setSuccess("Task updated successfully!")
       } else {
         await api.post("/tasks", taskData)
+        setSuccess("Task created successfully!")
       }
 
-      navigate("/")
+      // Redirect after a short delay to show success message
+      setTimeout(() => {
+        navigate("/")
+      }, 1500)
     } catch (error) {
       console.error("Error saving task:", error)
       setError(error.response?.data?.message || "Failed to save task. Please try again.")
@@ -73,20 +80,29 @@ const TaskForm = ({ task, isEditing = false }) => {
 
   return (
     <div className="task-form-container">
-      <h2>{isEditing ? "Edit Task" : "Create New Task"}</h2>
+      <div className="task-form-header">
+        <h2>{isEditing ? "Edit Task" : "Create New Task"}</h2>
+        <p className="task-form-subtitle">
+          {isEditing ? "Update task details or reassign it" : "Fill in the details to create a new task"}
+        </p>
+      </div>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="task-form-error">{error}</div>}
+      {success && <div className="task-form-success">{success}</div>}
 
       <form onSubmit={handleSubmit} className="task-form">
         <div className="form-group">
-          <label htmlFor="title">Title *</label>
+          <label htmlFor="title">
+            Title <span className="required">*</span>
+          </label>
           <input
             type="text"
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            placeholder="Task title"
+            placeholder="Enter task title"
+            className="form-control"
           />
         </div>
 
@@ -96,62 +112,95 @@ const TaskForm = ({ task, isEditing = false }) => {
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Task description"
+            placeholder="Enter task description"
             rows="4"
+            className="form-control"
           />
         </div>
 
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="dueDate">Due Date</label>
-            <input
-              type="date"
-              id="dueDate"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              min={new Date().toISOString().split("T")[0]}
-            />
+            <div className="date-input-container">
+              <input
+                type="date"
+                id="dueDate"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                min={new Date().toISOString().split("T")[0]}
+                className="form-control"
+              />
+              <i className="fas fa-calendar-alt date-icon"></i>
+            </div>
           </div>
 
           <div className="form-group">
             <label htmlFor="priority">Priority</label>
-            <select id="priority" value={priority} onChange={(e) => setPriority(e.target.value)}>
-              <option value="LOW">Low</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HIGH">High</option>
-            </select>
+            <div className="select-container">
+              <select
+                id="priority"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                className="form-control"
+              >
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+              </select>
+              <i className="fas fa-chevron-down select-icon"></i>
+            </div>
           </div>
         </div>
 
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="status">Status</label>
-            <select id="status" value={status} onChange={(e) => setStatus(e.target.value)}>
-              <option value="TODO">To Do</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="DONE">Done</option>
-            </select>
+            <div className="select-container">
+              <select id="status" value={status} onChange={(e) => setStatus(e.target.value)} className="form-control">
+                <option value="TODO">To Do</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="DONE">Done</option>
+              </select>
+              <i className="fas fa-chevron-down select-icon"></i>
+            </div>
           </div>
 
           <div className="form-group">
             <label htmlFor="assignedTo">Assign To</label>
-            <select id="assignedTo" value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)}>
-              <option value="">Unassigned</option>
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name}
-                </option>
-              ))}
-            </select>
+            <div className="select-container">
+              <select
+                id="assignedTo"
+                value={assignedTo}
+                onChange={(e) => setAssignedTo(e.target.value)}
+                className="form-control"
+              >
+                <option value="unassigned">Unassigned</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+              <i className="fas fa-chevron-down select-icon"></i>
+            </div>
           </div>
         </div>
 
         <div className="form-actions">
-          <button type="button" onClick={() => navigate("/")} className="cancel-btn">
-            Cancel
+          <button type="button" onClick={() => navigate("/")} className="btn-cancel">
+            <i className="fas fa-times"></i> Cancel
           </button>
-          <button type="submit" disabled={loading} className="submit-btn">
-            {loading ? "Saving..." : isEditing ? "Update Task" : "Create Task"}
+          <button type="submit" disabled={loading} className="btn-submit">
+            {loading ? (
+              <>
+                <span className="spinner"></span> {isEditing ? "Updating..." : "Creating..."}
+              </>
+            ) : (
+              <>
+                <i className={isEditing ? "fas fa-save" : "fas fa-plus-circle"}></i>
+                {isEditing ? "Update Task" : "Create Task"}
+              </>
+            )}
           </button>
         </div>
       </form>

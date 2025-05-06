@@ -10,11 +10,17 @@ const Register = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
   const { register, error: authError } = useAuth()
   const navigate = useNavigate()
+
+  // Password validation
+  const hasMinLength = password.length >= 6
+  const passwordsMatch = password === confirmPassword && password !== ""
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -45,10 +51,19 @@ const Register = () => {
     }
   }
 
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword)
+  }
+
+  const toggleShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword)
+  }
+
   return (
     <div className="auth-container">
       <div className="auth-card">
         <h2>Create an Account</h2>
+        <p className="auth-subtitle">Sign up to get started with TaskFlow</p>
 
         {(error || authError) && <div className="error-message">{error || authError}</div>}
 
@@ -62,6 +77,7 @@ const Register = () => {
               onChange={(e) => setName(e.target.value)}
               required
               placeholder="Enter your name"
+              className="form-input"
             />
           </div>
 
@@ -74,34 +90,65 @@ const Register = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="Enter your email"
+              className="form-input"
             />
           </div>
 
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="Create a password"
-            />
+            <div className="password-input-container">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Create a password"
+                className="form-input"
+              />
+              <button
+                type="button"
+                onClick={toggleShowPassword}
+                className="password-toggle-btn"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+            {password && (
+              <div className="password-requirements">
+                <p className={hasMinLength ? "requirement-met" : "requirement-not-met"}>
+                  • Password must be at least 6 characters
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              placeholder="Confirm your password"
-            />
+            <div className="password-input-container">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                placeholder="Confirm your password"
+                className="form-input"
+              />
+              <button
+                type="button"
+                onClick={toggleShowConfirmPassword}
+                className="password-toggle-btn"
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              >
+                {showConfirmPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+            {confirmPassword && !passwordsMatch && <p className="password-mismatch">Passwords do not match</p>}
           </div>
 
-          <button type="submit" disabled={loading} className="auth-button">
+          <button type="submit" disabled={loading || !passwordsMatch || !hasMinLength} className="auth-button">
             {loading ? "Creating Account..." : "Register"}
           </button>
         </form>

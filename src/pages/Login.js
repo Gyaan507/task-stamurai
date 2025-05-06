@@ -8,6 +8,7 @@ import "../styles/Auth.css"
 const Login = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -29,10 +30,15 @@ const Login = () => {
     }
   }
 
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword)
+  }
+
   return (
     <div className="auth-container">
       <div className="auth-card">
         <h2>Login to TaskFlow</h2>
+        <p className="auth-subtitle">Sign in to continue to your dashboard</p>
 
         {(error || authError) && <div className="error-message">{error || authError}</div>}
 
@@ -46,19 +52,31 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="Enter your email"
+              className="form-input"
             />
           </div>
 
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="Enter your password"
-            />
+            <div className="password-input-container">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Enter your password"
+                className="form-input"
+              />
+              <button
+                type="button"
+                onClick={toggleShowPassword}
+                className="password-toggle-btn"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
           </div>
 
           <button type="submit" disabled={loading} className="auth-button">

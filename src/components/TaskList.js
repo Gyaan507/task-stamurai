@@ -5,6 +5,7 @@ const TaskList = ({ tasks, emptyMessage }) => {
   if (!tasks || tasks.length === 0) {
     return (
       <div className="empty-task-list">
+        <div className="empty-icon">📋</div>
         <p>{emptyMessage || "No tasks found"}</p>
       </div>
     )

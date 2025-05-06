@@ -40,15 +40,23 @@ const Notifications = () => {
   }
 
   if (loading) {
-    return <div className="loading-spinner">Loading notifications...</div>
+    return (
+      <div className="notifications-loading">
+        <div className="loading-spinner"></div>
+        <p>Loading notifications...</p>
+      </div>
+    )
   }
 
   if (error) {
     return (
-      <div className="error-container">
-        <div className="error-message">{error}</div>
+      <div className="notifications-error">
+        <div className="error-message">
+          <i className="fas fa-exclamation-circle"></i>
+          <p>{error}</p>
+        </div>
         <Link to="/" className="back-btn">
-          Back to Dashboard
+          <i className="fas fa-arrow-left"></i> Back to Dashboard
         </Link>
       </div>
     )
@@ -57,14 +65,19 @@ const Notifications = () => {
   return (
     <div className="notifications-container">
       <div className="notifications-header">
-        <h2>Notifications</h2>
+        <h2>
+          <i className="fas fa-bell"></i> Notifications
+        </h2>
         <Link to="/" className="back-btn">
-          Back to Dashboard
+          <i className="fas fa-arrow-left"></i> Back to Dashboard
         </Link>
       </div>
 
       {notifications.length === 0 ? (
         <div className="empty-notifications">
+          <div className="empty-icon">
+            <i className="fas fa-bell-slash"></i>
+          </div>
           <p>You have no notifications</p>
         </div>
       ) : (
@@ -72,12 +85,17 @@ const Notifications = () => {
           {notifications.map((notification) => (
             <div key={notification.id} className={`notification-item ${notification.read ? "read" : "unread"}`}>
               <div className="notification-content">
-                <p className="notification-message">{notification.message}</p>
-                <span className="notification-time">{formatDate(notification.createdAt)}</span>
+                <p className="notification-message">
+                  <i className="fas fa-info-circle notification-icon"></i>
+                  {notification.message}
+                </p>
+                <span className="notification-time">
+                  <i className="fas fa-clock"></i> {formatDate(notification.createdAt)}
+                </span>
               </div>
               {notification.taskId && (
                 <Link to={`/tasks/${notification.taskId}`} className="view-task-btn">
-                  View Task
+                  <i className="fas fa-eye"></i> View Task
                 </Link>
               )}
             </div>
