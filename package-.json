@@ -1,0 +1,13 @@
+{
+  "name": "TaskFlow",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "myapp",
+    "backend"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=myapp",
+    "start": "npm run start --workspace=backend"
+  }
+}
