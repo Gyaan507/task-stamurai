@@ -2,23 +2,23 @@
   "version": 2,
   "builds": [
     {
-      "src": "myapp/package.json",
+      "src": "task-flow/forntend/package.json",
       "use": "@vercel/static-build",
       "config": { "distDir": "build" }
     },
     {
-      "src": "backend/server.js",
+      "src": "task-flow/backend/server.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/server.js"
+      "dest": "task-flow/backend/server.js"
     },
     {
       "src": "/(.*)",
-      "dest": "myapp/build/$1"
+      "dest": "task-flow/forntend/build/$1"
     }
   ]
 }
